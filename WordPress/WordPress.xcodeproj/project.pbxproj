@@ -5574,7 +5574,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "DERIVED_TMP_DIR=/tmp/WordPress.build\ncp ${SOURCE_ROOT}/Credentials/ApiCredentials.m ${DERIVED_TMP_DIR}/ApiCredentials.m\n\necho \"Checking for WordPress.com Oauth App Secret in $WPCOM_CONFIG\"\nif [ -a $WPCOM_CONFIG ]\nthen\necho \"Config found\"\nsource $WPCOM_CONFIG\nelse\necho \"No config found\"\nexit 0\nfi\n\nif [ -z $WPCOM_APP_ID ]\nthen\necho \"warning: Missing WPCOM_APP_ID\"\nexit 1\nfi\nif [ -z $WPCOM_APP_SECRET ]\nthen\necho \"warning: Missing WPCOM_APP_SECRET\"\nexit 1\nfi\n\necho \"Generating credentials file in ${DERIVED_TMP_DIR}/ApiCredentials.m\"\nruby ${SOURCE_ROOT}/Credentials/gencredentials.rb > ${DERIVED_TMP_DIR}/ApiCredentials.m\n";
+			shellScript = "DERIVED_TMP_DIR=/tmp/WordPress.build\ncp ${SOURCE_ROOT}/Credentials/ApiCredentials.m ${DERIVED_TMP_DIR}/ApiCredentials.m\n\necho \"Checking for WordPress.com Oauth App Secret in $WPCOM_CONFIG\"\nif [ -a $WPCOM_CONFIG ]\nthen\n    if [ -z $BUDDYBUILD_SECURE_FILES ]\n        then\n        echo \"NO BUDDY BUILD\"\n        echo \"Config found\"\n        source $WPCOM_CONFIG\n    else\n        echo \"Detected Buddybuild - using secure file location\"\n        source $BUDDYBUILD_SECURE_FILES/wpcom_app_credentials\n    fi\nelse\n    echo \"No config found\"\n    exit 0\nfi\n\nif [ -z $WPCOM_APP_ID ]\nthen\necho \"warning: Missing WPCOM_APP_ID\"\nexit 1\nfi\nif [ -z $WPCOM_APP_SECRET ]\nthen\necho \"warning: Missing WPCOM_APP_SECRET\"\nexit 1\nfi\n\necho \"Generating credentials file in ${DERIVED_TMP_DIR}/ApiCredentials.m\"\nruby ${SOURCE_ROOT}/Credentials/gencredentials.rb > ${DERIVED_TMP_DIR}/ApiCredentials.m\n";
 			showEnvVarsInLog = 0;
 		};
 		E18E5C5C1CD9EFBB00B70AFD /* Lint check */ = {
