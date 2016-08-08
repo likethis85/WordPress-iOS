@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-echo "Detected Prebuild Step"
+echo "warning: Detected Prebuild Step"
