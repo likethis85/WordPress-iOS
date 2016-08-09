@@ -27,6 +27,7 @@ abstract_target 'WordPress_Base' do
     pod 'Helpshift', '~> 5.5.1'
     pod 'HockeySDK', '~> 3.8.0', :configurations => ['Release-Internal', 'Release-Alpha']
     pod 'Lookback', '1.3.0', :configurations => ['Release-Internal', 'Release-Alpha']
+    pod 'BuddyBuildSDK', '~> 1.0.11'
     pod 'MRProgress', '~>0.7.0'
     pod 'Mixpanel', '2.9.4'
     pod 'Reachability',	'3.2'
