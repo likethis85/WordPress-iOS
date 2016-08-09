@@ -154,7 +154,7 @@
 
 #ifdef BUDDYBUILD_ENABLED
 #import <BuddyBuildSDK/BuddyBuildSDK.h>
-#endif BUDDYBUILD_ENABLED
+#endif
 
 #import <WPMediaPicker/WPMediaPicker.h>
 
