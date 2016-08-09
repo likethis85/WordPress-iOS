@@ -151,7 +151,10 @@
 #import <FormatterKit/FormatterKit-umbrella.h>
 #import <WordPress_AppbotX/ABXPromptView.h>
 #import <WordPressComAnalytics/WPAnalytics.h>
+
+#ifdef BUDDYBUILD_ENABLED
 #import <BuddyBuildSDK/BuddyBuildSDK.h>
+#endif BUDDYBUILD_ENABLED
 
 #import <WPMediaPicker/WPMediaPicker.h>
 
