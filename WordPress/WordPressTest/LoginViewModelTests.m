@@ -276,7 +276,7 @@ describe(@"cancellable", ^{
     it(@"when it's true it should display the cancel button", ^{
         [[mockViewModelPresenter expect] setCancelButtonHidden:NO];
         
-        viewModel.cancellable = NO;
+        viewModel.cancellable = YES;
         
         [mockViewModelPresenter verify];
     });
