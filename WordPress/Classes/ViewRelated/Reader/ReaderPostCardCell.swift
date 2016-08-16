@@ -35,6 +35,7 @@ import WordPressShared
     @IBOutlet private weak var tagButton: UIButton!
     @IBOutlet private weak var wordCountLabel: UILabel!
     @IBOutlet private weak var attributionView: ReaderCardDiscoverAttributionView!
+    @IBOutlet private weak var galleryView: ReaderCardGalleryStripView!
 
     // Action buttons
     @IBOutlet private weak var actionButtonRight: UIButton!
@@ -45,6 +46,7 @@ import WordPressShared
     @IBOutlet private weak var featuredMediaBottomConstraint: NSLayoutConstraint!
     @IBOutlet private weak var titleLabelBottomConstraint: NSLayoutConstraint!
     @IBOutlet private weak var summaryLabelBottomConstraint: NSLayoutConstraint!
+    @IBOutlet private weak var galleryStripBottomConstraint: NSLayoutConstraint!
     @IBOutlet private weak var attributionHeightConstraint: NSLayoutConstraint!
     @IBOutlet private weak var attributionBottomConstraint: NSLayoutConstraint!
     @IBOutlet private weak var wordCountBottomConstraint: NSLayoutConstraint!
@@ -60,6 +62,7 @@ import WordPressShared
     private var featuredMediaBottomConstraintConstant = CGFloat(0.0)
     private var titleLabelBottomConstraintConstant = CGFloat(0.0)
     private var summaryLabelBottomConstraintConstant = CGFloat(0.0)
+    private var galleryStripBottomConstraintConstant = CGFloat(0.0)
     private var attributionBottomConstraintConstant = CGFloat(0.0)
     private var wordCountBottomConstraintConstant = CGFloat(0.0)
     private var actionButtonViewHeightConstraintConstant = CGFloat(0.0)
@@ -220,6 +223,7 @@ import WordPressShared
         featuredMediaBottomConstraintConstant = featuredMediaBottomConstraint.constant
         titleLabelBottomConstraintConstant = titleLabelBottomConstraint.constant
         summaryLabelBottomConstraintConstant = summaryLabelBottomConstraint.constant
+        galleryStripBottomConstraintConstant = galleryStripBottomConstraint.constant
         attributionBottomConstraintConstant = attributionBottomConstraint.constant
         wordCountBottomConstraintConstant = wordCountBottomConstraint.constant
         actionButtonViewHeightConstraintConstant = actionButtonViewHeightConstraint.constant
@@ -266,6 +270,7 @@ import WordPressShared
         configureCardImage()
         configureTitle()
         configureSummary()
+        configureGalleryStrip()
         configureAttribution()
         configureTag()
         configureWordCount()
@@ -393,6 +398,16 @@ import WordPressShared
 
         summaryLabel.numberOfLines = summaryMaxNumberOfLines
         summaryLabel.lineBreakMode = .ByTruncatingTail
+    }
+
+    private func configureGalleryStrip() {
+        if contentProvider == nil || true {
+            galleryStripBottomConstraint.constant = 0.0
+            galleryView.configureView(nil)
+        } else {
+            galleryView.configureView(contentProvider)
+            galleryStripBottomConstraint.constant = galleryStripBottomConstraintConstant
+        }
     }
 
     private func configureAttribution() {
