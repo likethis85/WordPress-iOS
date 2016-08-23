@@ -233,15 +233,15 @@ extension NotificationDetailsViewController: UITableViewDelegate, UITableViewDat
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let group = blockGroupForIndexPath(indexPath)
 
-        switch group.type {
+        switch group.kind {
         case .Header:
             displayNotificationSource()
         case .User:
-            let targetURL = group.blockOfType(.User)?.metaLinksHome
+            let targetURL = group.blockOfKind(.User)?.metaLinksHome
             displayURL(targetURL)
         case .Footer:
             // By convention, the last range is the one that always contains the targetURL
-            let targetURL = group.blockOfType(.Text)?.ranges.last?.url
+            let targetURL = group.blockOfKind(.Text)?.ranges.last?.url
             displayURL(targetURL)
         default:
             tableView.deselectSelectedRowWithAnimation(true)
@@ -301,11 +301,13 @@ extension NotificationDetailsViewController
         replyTextView.accessibilityIdentifier = NSLocalizedString("Reply Text", comment: "Notifications Reply Accessibility Identifier")
         replyTextView.delegate = self
         replyTextView.onReply = { [weak self] content in
-            guard let block = self?.note.blockGroupOfType(.Comment)?.blockOfType(.Comment) else {
+            guard let block = self?.note.blockGroupOfKind(.Comment)?.blockOfKind(.Comment) else {
                 return
             }
             self?.replyCommentWithBlock(block, content: content)
         }
+
+        replyTextView.setContentCompressionResistancePriority(UILayoutPriorityRequired, forAxis: .Vertical)
 
         self.replyTextView = replyTextView
     }
@@ -354,7 +356,7 @@ extension NotificationDetailsViewController
     var shouldAttachReplyView: Bool {
         // Attach the Reply component only if the noficiation has a comment, and it can be replied-to
         //
-        guard let block = note.blockGroupOfType(.Comment)?.blockOfType(.Comment) else {
+        guard let block = note.blockGroupOfKind(.Comment)?.blockOfKind(.Comment) else {
             return false
         }
 
@@ -412,12 +414,14 @@ private extension NotificationDetailsViewController
     }
 
     var shouldAttachEditAction: Bool {
-        let block = note.blockGroupOfType(.Comment)?.blockOfType(.Comment)
-        return block?.isActionOn(.Edit) ?? false
+        // Note: Approve Action is actually a synonym for 'Edition' (Based on Calypso's basecode)
+        let block = note.blockGroupOfKind(.Comment)?.blockOfKind(.Comment)
+        return block?.isActionOn(.Approve) ?? false
     }
 
     @objc @IBAction func editButtonWasPressed() {
-        guard let block = note.blockGroupOfType(.Comment)?.blockOfType(.Comment) where block.isActionOn(.Edit) else {
+        // Note: Approve Action is actually a synonym for 'Edition' (Based on Calypso's basecode)
+        guard let block = note.blockGroupOfKind(.Comment)?.blockOfKind(.Comment) where block.isActionOn(.Approve) else {
             return
         }
 
@@ -444,7 +448,7 @@ private extension NotificationDetailsViewController
     }
 
     func layoutIdentifierForGroup(blockGroup: NotificationBlockGroup) -> String {
-        switch blockGroup.type {
+        switch blockGroup.kind {
         case .Header:
             return NoteBlockHeaderTableViewCell.layoutIdentifier()
         case .Footer:
@@ -465,7 +469,7 @@ private extension NotificationDetailsViewController
     }
 
     func reuseIdentifierForGroup(blockGroup: NotificationBlockGroup) -> String {
-        switch blockGroup.type {
+        switch blockGroup.kind {
         case .Header:
             return NoteBlockHeaderTableViewCell.reuseIdentifier()
         case .Footer:
@@ -499,7 +503,7 @@ private extension NotificationDetailsViewController
         switch cell {
         case let cell as NoteBlockHeaderTableViewCell:
             setupHeaderCell(cell, blockGroup: blockGroup)
-        case let cell as NoteBlockTextTableViewCell where blockGroup.type == .Footer:
+        case let cell as NoteBlockTextTableViewCell where blockGroup.kind == .Footer:
             setupFooterCell(cell, blockGroup: blockGroup)
         case let cell as NoteBlockUserTableViewCell:
             setupUserCell(cell, blockGroup: blockGroup)
@@ -522,10 +526,10 @@ private extension NotificationDetailsViewController
         // -   UITableViewCell automatically handles highlight / unhighlight for us
         // -   UITableViewCell's taps don't require a Gestures Recognizer. No big deal, but less code!
         //
-        let gravatarBlock = blockGroup.blockOfType(.Image)
-        let snippetBlock = blockGroup.blockOfType(.Text)
+        let gravatarBlock = blockGroup.blockOfKind(.Image)
+        let snippetBlock = blockGroup.blockOfKind(.Text)
 
-        cell.attributedHeaderTitle = gravatarBlock?.attributedHeaderTitleText()
+        cell.attributedHeaderTitle = gravatarBlock?.attributedHeaderTitleText
         cell.headerDetails = snippetBlock?.text
 
         // Download the Gravatar (If Needed!)
@@ -543,7 +547,7 @@ private extension NotificationDetailsViewController
             return
         }
 
-        cell.attributedText = textBlock.attributedFooterText()
+        cell.attributedText = textBlock.attributedFooterText
         cell.isTextViewSelectable = false
         cell.isTextViewClickable = false
     }
@@ -590,29 +594,29 @@ private extension NotificationDetailsViewController
         //  -   Font colors are updated.
         //  -   A left separator is displayed.
         //
-        guard let commentBlock = blockGroup.blockOfType(.Comment) else {
+        guard let commentBlock = blockGroup.blockOfKind(.Comment) else {
             assertionFailure("Missing Comment Block for Notification [\(note.simperiumKey)]")
             return
         }
 
-        guard let userBlock = blockGroup.blockOfType(.User) else {
+        guard let userBlock = blockGroup.blockOfKind(.User) else {
             assertionFailure("Missing User Block for Notification [\(note.simperiumKey)]")
             return
         }
 
         // Merge the Attachments with their ranges: [NSRange: UIImage]
-        let mediaMap = mediaDownloader.imagesForUrls(commentBlock.imageUrls())
+        let mediaMap = mediaDownloader.imagesForUrls(commentBlock.imageUrls)
         let mediaRanges = commentBlock.buildRangesToImagesMap(mediaMap)
 
-        let text = commentBlock.attributedRichText().stringByEmbeddingImageAttachments(mediaRanges)
+        let text = commentBlock.attributedRichText.stringByEmbeddingImageAttachments(mediaRanges)
 
         // Setup: Properties
         cell.name                   = userBlock.text
         cell.timestamp              = note.timestampAsDate.shortString()
         cell.site                   = userBlock.metaTitlesHome ?? userBlock.metaLinksHome?.host
         cell.attributedCommentText  = text.trimTrailingNewlines()
-        cell.isApproved             = commentBlock.isCommentApproved()
-        cell.hasReply               = note.hasReply
+        cell.isApproved             = commentBlock.isCommentApproved
+        cell.isRepliedComment       = note.isRepliedComment
 
         // Setup: Callbacks
         cell.onDetailsClick = { [weak self] sender in
@@ -645,7 +649,7 @@ private extension NotificationDetailsViewController
     }
 
     func setupActionsCell(cell: NoteBlockActionsTableViewCell, blockGroup: NotificationBlockGroup) {
-        guard let commentBlock = blockGroup.blockOfType(.Comment) else {
+        guard let commentBlock = blockGroup.blockOfKind(.Comment) else {
             assertionFailure("Missing Comment Block for Notification \(note.simperiumKey)")
             return
         }
@@ -710,11 +714,11 @@ private extension NotificationDetailsViewController
         }
 
         // Merge the Attachments with their ranges: [NSRange: UIImage]
-        let mediaMap = mediaDownloader.imagesForUrls(textBlock.imageUrls())
+        let mediaMap = mediaDownloader.imagesForUrls(textBlock.imageUrls)
         let mediaRanges = textBlock.buildRangesToImagesMap(mediaMap)
 
         // Load the attributedText
-        let text = note.isBadge ? textBlock.attributedBadgeText() : textBlock.attributedRichText()
+        let text = note.isBadge ? textBlock.attributedBadgeText : textBlock.attributedRichText
 
         // Setup: Properties
         cell.attributedText = text.stringByEmbeddingImageAttachments(mediaRanges)
@@ -777,24 +781,24 @@ extension NotificationDetailsViewController
     }
 
     func displayNotificationSource() {
-        guard let type = note.type, let resourceURL = note.resourceURL() else {
+        guard let resourceURL = note.resourceURL else {
             tableView.deselectSelectedRowWithAnimation(true)
             return
         }
 
         do {
-            switch type {
-            case NoteTypeFollow:
+            switch note.kind {
+            case .Follow:
                 try displayStreamWithSiteID(note.metaSiteID)
-            case NoteTypeLike:
+            case .Like:
                 fallthrough
-            case NoteTypeMatcher:
+            case .Matcher:
                 fallthrough
-            case NoteTypePost:
+            case .Post:
                 try displayReaderWithPostId(note.metaPostID, siteID: note.metaSiteID)
-            case NoteTypeComment:
+            case .Comment:
                 fallthrough
-            case NoteTypeCommentLike:
+            case .CommentLike:
                 try displayCommentsWithPostId(note.metaPostID, siteID: note.metaSiteID)
             default:
                 throw DisplayError.UnsupportedType
@@ -813,7 +817,7 @@ extension NotificationDetailsViewController
             throw DisplayError.MissingParameter
         }
 
-        switch range.type {
+        switch range.kind {
         case .Site:
             try displayStreamWithSiteID(range.siteID)
         case .Post:
@@ -954,7 +958,7 @@ private extension NotificationDetailsViewController
         //  -   Plus, we'll also resize the downloaded media cache *if needed*. This is meant to adjust images to
         //      better fit onscreen, whenever the device orientation changes (and in turn, the maxMediaEmbedWidth changes too).
         //
-        let imageUrls = blockGroup.imageUrlsForBlocksOfTypes(Media.richBlockTypes)
+        let imageUrls = blockGroup.imageUrlsFromBlocksInKindSet(Media.richBlockTypes)
 
         let completion = {
             // Workaround: Performing the reload call, multiple times, without the .BeginFromCurrentState might
@@ -1227,7 +1231,7 @@ private extension NotificationDetailsViewController
     }
 
     enum Media {
-        static let richBlockTypes           = Set(arrayLiteral: NoteBlockType.Text.rawValue, NoteBlockType.Comment.rawValue)
+        static let richBlockTypes           = Set(arrayLiteral: NotificationBlock.Kind.Text, NotificationBlock.Kind.Comment)
         static let duration                 = NSTimeInterval(0.25)
         static let delay                    = NSTimeInterval(0)
         static let options                  : UIViewAnimationOptions = [.OverrideInheritedDuration, .BeginFromCurrentState]
