@@ -37,6 +37,7 @@
 #import "MediaLibraryPickerDataSource.h"
 #import "WPAndDeviceMediaLibraryDataSource.h"
 #import "WPAppAnalytics.h"
+#import "WordPress-Swift.h"
 
 @import Gridicons;
 
@@ -51,11 +52,6 @@ static NSString* const WPProgressMediaError = @"WPProgressMediaError";
 
 NSString* const WPPostViewControllerOptionOpenMediaPicker = @"WPPostViewControllerMediaPicker";
 NSString* const WPPostViewControllerOptionNotAnimated = @"WPPostViewControllerNotAnimated";
-
-NSString* const kUserDefaultsNewEditorAvailable = @"kUserDefaultsNewEditorAvailable";
-NSString* const kUserDefaultsNewEditorEnabled = @"kUserDefaultsNewEditorEnabled";
-
-NSString* const kUserDefaultsNativeEditorEnabled = @"kUserDefaultsNativeEditorEnabled";
 
 // Secret URL config parameters
 NSString *const kWPEditorConfigURLParamAvailable = @"available";
@@ -381,7 +377,7 @@ EditImageDetailsViewControllerDelegate
 {
     UIViewController* restoredViewController = nil;
     
-    BOOL restoreOnlyIfNewEditorIsEnabled = [WPPostViewController isNewEditorEnabled];
+    BOOL restoreOnlyIfNewEditorIsEnabled = [[EditorSettings new] visualEditorEnabled];
     
     if (restoreOnlyIfNewEditorIsEnabled) {
         restoredViewController = [self restoreViewControllerWithIdentifierPath:identifierComponents
@@ -896,71 +892,6 @@ EditImageDetailsViewControllerDelegate
     
     [super startEditing];
 }
-
-#pragma mark - Visual editor in settings
-
-+ (void)setNewEditorAvailable:(BOOL)isAvailable
-{
-	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-	[defaults setBool:isAvailable forKey:kUserDefaultsNewEditorAvailable];
-	[defaults synchronize];
-}
-
-+ (void)setNewEditorEnabled:(BOOL)isEnabled
-{
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setBool:isEnabled forKey:kUserDefaultsNewEditorEnabled];
-    [defaults synchronize];
-    
-    if (isEnabled) {
-        [WPAnalytics track:WPAnalyticsStatEditorEnabledNewVersion];
-    }
-}
-
-+ (BOOL)makeNewEditorAvailable
-{
-    BOOL result = NO;
-    BOOL newVisualEditorNotAvailable = ![WPPostViewController isNewEditorAvailable];
-    
-    if (newVisualEditorNotAvailable) {
-        
-        result = YES;
-        [WPPostViewController setNewEditorAvailable:YES];
-        [WPPostViewController setNewEditorEnabled:YES];
-    }
-    
-    return result;
-}
-
-+ (BOOL)isNewEditorAvailable
-{
-	return [[NSUserDefaults standardUserDefaults] boolForKey:kUserDefaultsNewEditorAvailable];
-}
-
-+ (BOOL)isNewEditorEnabled
-{
-    return [[NSUserDefaults standardUserDefaults] boolForKey:kUserDefaultsNewEditorEnabled];
-}
-
-+ (BOOL)isNativeEditorEnabled
-{    
-    return [[NSUserDefaults standardUserDefaults] boolForKey:kUserDefaultsNativeEditorEnabled];
-}
-
-+ (void)setNativeEditorEnabled:(BOOL)isEnabled
-{
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setBool:isEnabled forKey:kUserDefaultsNativeEditorEnabled];
-    [defaults synchronize];
-}
-
-+ (void)isNativeEditorEnabled:(BOOL)isEnabled
-{
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setBool:isEnabled forKey:kUserDefaultsNativeEditorEnabled];
-    [defaults synchronize];
-}
-
 
 #pragma mark - Instance Methods
 

@@ -354,8 +354,9 @@ class PostListViewController : AbstractPostListViewController, UIViewControllerR
     // MARK: - Post Actions
 
     override func createPost() {
-        if WPPostViewController.isNewEditorEnabled() {
-            if WPPostViewController.isNativeEditorEnabled() {
+        let editorSettings = EditorSettings()
+        if editorSettings.visualEditorEnabled {
+            if editorSettings.nativeEditorEnabled {
                 createPostInNativeEditor()
             } else {
                 createPostInNewEditor()
@@ -366,7 +367,8 @@ class PostListViewController : AbstractPostListViewController, UIViewControllerR
     }
 
     private func createPostInNativeEditor() {
-        let postViewController = AztecPostViewController()
+        let post = PostService.createDraftPostInMainContextForBlog(blog)
+        let postViewController = AztecPostViewController(post:post)
         let navController = UINavigationController(rootViewController: postViewController)
         navController.modalPresentationStyle = .FullScreen
         presentViewController(navController, animated: true, completion: nil)
@@ -421,10 +423,10 @@ class PostListViewController : AbstractPostListViewController, UIViewControllerR
 
     private func editPost(apost: AbstractPost, withEditMode mode: WPPostViewControllerMode) {
         WPAnalytics.track(.PostListEditAction, withProperties: propertiesForAnalytics())
-
-        if WPPostViewController.isNewEditorEnabled() {
-            if (WPPostViewController.isNativeEditorEnabled()) {
-                let postViewController = AztecPostViewController()
+        let editorSettings = EditorSettings()
+        if editorSettings.visualEditorEnabled {
+            if editorSettings.nativeEditorEnabled {
+                let postViewController = AztecPostViewController(post: apost)
                 let navController = UINavigationController(rootViewController: postViewController)
                 navController.modalPresentationStyle = .FullScreen
                 presentViewController(navController, animated: true, completion: nil)
