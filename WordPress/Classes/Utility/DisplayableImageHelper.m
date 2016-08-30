@@ -2,9 +2,13 @@
 
 static const NSInteger FeaturedImageMinimumWidth = 150;
 
+// Min size for images in post content to be shown in a gallery - matches the Calypso web reader
+static const NSInteger GalleryMinimumWidth = 144;
+
 static NSString * const AttachmentsDictionaryKeyWidth = @"width";
 static NSString * const AttachmentsDictionaryKeyURL = @"URL";
 static NSString * const AttachmentsDictionaryKeyMimeType = @"mime_type";
+static NSString * const ImagePattern = @"<img(\\s+.*?)(?:src\\s*=\\s*(?:'|\")(.*?)(?:'|\"))(.*?)>";
 
 @implementation DisplayableImageHelper
 
@@ -57,41 +61,18 @@ static NSString * const AttachmentsDictionaryKeyMimeType = @"mime_type";
 + (NSString *)searchPostContentForImageToDisplay:(NSString *)content
 {
     NSString *imageSrc = @"";
-    // If there is no image tag in the content, just bail.
-    if (!content || [content rangeOfString:@"<img"].location == NSNotFound) {
+    NSArray *imageMatches = [self extractAllImageMatchesFromPostContent:content];
+    // If there are no images found, just bail.
+    if (!imageMatches || imageMatches.count == 0) {
         return imageSrc;
     }
-
-    // Get all the things
-    static NSRegularExpression *regex;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        NSError *error;
-        NSString *imgPattern = @"<img(\\s+.*?)(?:src\\s*=\\s*(?:'|\")(.*?)(?:'|\"))(.*?)>";
-        regex = [NSRegularExpression regularExpressionWithPattern:imgPattern options:NSRegularExpressionCaseInsensitive error:&error];
-    });
-
-    // Find all the image tags in the content passed.
-    NSArray *matches = [regex matchesInString:content options:NSRegularExpressionCaseInsensitive range:NSMakeRange(0, [content length])];
-
+    
     NSString *firstImageWithNoSize;
     NSInteger currentMaxWidth = FeaturedImageMinimumWidth;
-    for (NSTextCheckingResult *match in matches) {
+    for (NSTextCheckingResult *match in imageMatches) {
         NSString *tag = [content substringWithRange:match.range];
         NSString *src = [self extractSrcFromImgTag:tag];
-
-        // Ignore WordPress emoji images
-        if ([src rangeOfString:@"/images/core/emoji/"].location != NSNotFound ||
-            [src rangeOfString:@"/wp-includes/images/smilies/"].location != NSNotFound ||
-            [src rangeOfString:@"/wp-content/mu-plugins/wpcom-smileys/"].location != NSNotFound) {
-            continue;
-        }
-
-        // Ignore .svg images since we can't display them in a UIImageView
-        if ([src rangeOfString:@".svg"].location != NSNotFound) {
-            continue;
-        }
-
+        
         // Check the tag for a good width
         NSInteger width = MAX([self widthFromElementAttribute:tag], [self widthFromQueryString:src]);
         if (width > currentMaxWidth) {
@@ -101,12 +82,76 @@ static NSString * const AttachmentsDictionaryKeyMimeType = @"mime_type";
             firstImageWithNoSize = src;
         }
     }
-
+    
     if ([imageSrc length] == 0 && firstImageWithNoSize) {
         imageSrc = firstImageWithNoSize;
     }
-
+    
     return imageSrc;
+}
+
++ (NSArray *)searchPostContentForGalleryImages:(NSString *)content
+{
+    NSMutableArray *imageSources = [NSMutableArray new];
+    NSArray *imageMatches = [self extractAllImageMatchesFromPostContent:content];
+    // If there are no images found, just bail.
+    if (!imageMatches || imageMatches.count == 0) {
+        [NSArray arrayWithArray:imageSources];
+    }
+
+    for (NSTextCheckingResult *match in imageMatches) {
+        NSString *tag = [content substringWithRange:match.range];
+        NSString *src = [self extractSrcFromImgTag:tag];
+
+        // Check the tag for a good width
+        NSInteger width = MAX([self widthFromElementAttribute:tag], [self widthFromQueryString:src]);
+        if (width > GalleryMinimumWidth) {
+            [imageSources addObject:src];
+        }
+    }
+
+    return [NSArray arrayWithArray:imageSources];
+}
+
++ (NSArray *)extractAllImageMatchesFromPostContent:(NSString *)content
+{
+    NSMutableArray *imageMatches = [NSMutableArray new];
+    // If there is no image tag in the content, just bail.
+    if (!content || [content rangeOfString:@"<img"].location == NSNotFound) {
+        [NSArray arrayWithArray:imageMatches];
+    }
+    
+    // Get all the things
+    static NSRegularExpression *regex;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        NSError *error;
+        regex = [NSRegularExpression regularExpressionWithPattern:ImagePattern options:NSRegularExpressionCaseInsensitive error:&error];
+    });
+    
+    // Find all the image tags in the content passed.
+    NSArray *matches = [regex matchesInString:content options:NSRegularExpressionCaseInsensitive range:NSMakeRange(0, [content length])];
+
+    for (NSTextCheckingResult *match in matches) {
+        NSString *tag = [content substringWithRange:match.range];
+        NSString *src = [self extractSrcFromImgTag:tag];
+        
+        // Ignore WordPress emoji images
+        if ([src rangeOfString:@"/images/core/emoji/"].location != NSNotFound ||
+            [src rangeOfString:@"/wp-includes/images/smilies/"].location != NSNotFound ||
+            [src rangeOfString:@"/wp-content/mu-plugins/wpcom-smileys/"].location != NSNotFound) {
+            continue;
+        }
+        
+        // Ignore .svg images since we can't display them in a UIImageView
+        if ([src rangeOfString:@".svg"].location != NSNotFound) {
+            continue;
+        }
+        
+        [imageMatches addObject:match];
+    }
+    
+    return [NSArray arrayWithArray:imageMatches];
 }
 
 /**

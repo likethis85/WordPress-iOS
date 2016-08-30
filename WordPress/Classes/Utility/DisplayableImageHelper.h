@@ -25,4 +25,14 @@
  */
 + (NSString *)searchPostContentForImageToDisplay:(NSString *)content;
 
+/**
+ Search the passed string for images that are gallery images.
+ 
+ @details Loops over all img tags in the passed html content, extracts the URL from the
+ src attribute and checks for an acceptable width.  
+ @param content The content string to search.
+ @return An array of URL paths for the images.
+ */
++ (NSArray *)searchPostContentForGalleryImages:(NSString *)content;
+
 @end
