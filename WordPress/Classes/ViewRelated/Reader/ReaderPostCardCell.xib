@@ -2,6 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10116" systemVersion="15G31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
@@ -114,9 +115,62 @@
                                         <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="f9g-bl-DuI" customClass="ReaderCardGalleryStripView" customModule="WordPress" customModuleProvider="target">
+                                    <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="f9g-bl-DuI" customClass="ReaderCardGalleryStripView" customModule="WordPress" customModuleProvider="target">
                                         <rect key="frame" x="16" y="327" width="288" height="68"/>
+                                        <subviews>
+                                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="7br-ff-Uix">
+                                                <rect key="frame" x="0.0" y="0.0" width="72" height="68"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="72" id="8sz-Cc-EhX"/>
+                                                </constraints>
+                                            </imageView>
+                                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="dHU-hv-eC0">
+                                                <rect key="frame" x="80" y="0.0" width="72" height="68"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="72" id="xaE-th-7F7"/>
+                                                </constraints>
+                                            </imageView>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="XX Images" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ox2-UU-cvv">
+                                                <rect key="frame" x="160" y="35" width="120" height="15"/>
+                                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" lineBreakMode="tailTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rON-Dd-Wjg">
+                                                <rect key="frame" x="160" y="18" width="120" height="32"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                <inset key="titleEdgeInsets" minX="0.0" minY="0.0" maxX="0.0" maxY="15"/>
+                                                <state key="normal" title="View Images">
+                                                    <color key="titleColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                                </state>
+                                            </button>
+                                        </subviews>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        <color key="tintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                        <constraints>
+                                            <constraint firstItem="Ox2-UU-cvv" firstAttribute="top" secondItem="f9g-bl-DuI" secondAttribute="top" constant="35" id="Mv2-h2-Cot"/>
+                                            <constraint firstItem="Ox2-UU-cvv" firstAttribute="trailing" secondItem="f9g-bl-DuI" secondAttribute="trailingMargin" id="N4J-hX-100"/>
+                                            <constraint firstAttribute="height" relation="lessThanOrEqual" constant="68" id="OhD-1C-lJq"/>
+                                            <constraint firstItem="rON-Dd-Wjg" firstAttribute="leading" secondItem="Ox2-UU-cvv" secondAttribute="leading" id="SUY-3x-rvb"/>
+                                            <constraint firstItem="7br-ff-Uix" firstAttribute="top" secondItem="f9g-bl-DuI" secondAttribute="top" id="Vis-OG-TBV"/>
+                                            <constraint firstItem="rON-Dd-Wjg" firstAttribute="centerY" secondItem="dHU-hv-eC0" secondAttribute="centerY" id="ZUy-Li-0uS"/>
+                                            <constraint firstItem="Ox2-UU-cvv" firstAttribute="leading" secondItem="dHU-hv-eC0" secondAttribute="trailing" constant="8" symbolic="YES" id="aGF-Kt-ejr"/>
+                                            <constraint firstItem="rON-Dd-Wjg" firstAttribute="bottom" secondItem="Ox2-UU-cvv" secondAttribute="bottom" id="h2Q-DR-xbs"/>
+                                            <constraint firstAttribute="bottom" secondItem="7br-ff-Uix" secondAttribute="bottom" id="jiH-IP-9l7"/>
+                                            <constraint firstItem="rON-Dd-Wjg" firstAttribute="trailing" secondItem="Ox2-UU-cvv" secondAttribute="trailing" id="nMg-v1-krv"/>
+                                            <constraint firstItem="7br-ff-Uix" firstAttribute="leading" secondItem="f9g-bl-DuI" secondAttribute="leading" id="ptz-P2-KP7"/>
+                                            <constraint firstItem="dHU-hv-eC0" firstAttribute="leading" secondItem="7br-ff-Uix" secondAttribute="trailing" constant="8" symbolic="YES" id="zQY-V9-dDx"/>
+                                            <constraint firstItem="7br-ff-Uix" firstAttribute="bottom" secondItem="dHU-hv-eC0" secondAttribute="bottom" id="zdc-Cd-49i"/>
+                                            <constraint firstItem="7br-ff-Uix" firstAttribute="top" secondItem="dHU-hv-eC0" secondAttribute="top" id="zn1-od-qbE"/>
+                                        </constraints>
+                                        <connections>
+                                            <outlet property="galleryImageView1" destination="7br-ff-Uix" id="PHY-kA-U3n"/>
+                                            <outlet property="galleryImageView2" destination="dHU-hv-eC0" id="Vcw-DK-Xxb"/>
+                                            <outlet property="numberOfImagesLabel" destination="Ox2-UU-cvv" id="y3v-hk-1zy"/>
+                                            <outlet property="viewGalleryLabel" destination="rON-Dd-Wjg" id="1y4-9p-H4w"/>
+                                        </connections>
                                     </view>
                                     <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aU5-S0-uXT" customClass="ReaderCardDiscoverAttributionView" customModule="WordPress">
                                         <rect key="frame" x="16" y="401" width="288" height="32"/>
@@ -313,6 +367,7 @@
                 <outlet property="featuredMediaHeightConstraint" destination="Uc8-KW-ShJ" id="AJk-Mk-3xP"/>
                 <outlet property="featuredMediaView" destination="FV8-lg-7ZL" id="XvD-Nd-A7E"/>
                 <outlet property="galleryStripBottomConstraint" destination="FFf-CP-gzj" id="mb3-ba-OM0"/>
+                <outlet property="galleryStripHeightConstraint" destination="OhD-1C-lJq" id="q6g-bV-Sbw"/>
                 <outlet property="galleryView" destination="f9g-bl-DuI" id="iJH-sZ-SqN"/>
                 <outlet property="headerView" destination="l8A-oh-TmY" id="Iw0-ga-qZG"/>
                 <outlet property="innerContentView" destination="tU3-wI-Ijv" id="pfV-Ts-HN7"/>

@@ -46,6 +46,7 @@ import WordPressShared
     @IBOutlet private weak var featuredMediaBottomConstraint: NSLayoutConstraint!
     @IBOutlet private weak var titleLabelBottomConstraint: NSLayoutConstraint!
     @IBOutlet private weak var summaryLabelBottomConstraint: NSLayoutConstraint!
+    @IBOutlet private weak var galleryStripHeightConstraint: NSLayoutConstraint!
     @IBOutlet private weak var galleryStripBottomConstraint: NSLayoutConstraint!
     @IBOutlet private weak var attributionHeightConstraint: NSLayoutConstraint!
     @IBOutlet private weak var attributionBottomConstraint: NSLayoutConstraint!
@@ -72,6 +73,7 @@ import WordPressShared
 
     private let summaryMaxNumberOfLines = 3
     private let maxAttributionViewHeight: CGFloat = 200.0 // 200 is an arbitrary height, but should be a sufficiently high number.
+    private let galleryStripViewHeight: CGFloat = 200.0
     private let avgWordsPerMinuteRead = 250
     private let minimumMinutesToRead = 2
     private var currentLoadedCardImageURL: String?
@@ -170,6 +172,14 @@ import WordPressShared
 
         height += summaryLabel.sizeThatFits(innerSize).height
         height += summaryLabelBottomConstraint.constant
+
+        // The gallery strips view's height constraint is to be less than or equal
+        // to the constant. Skip the math when the constant is zero, but use
+        // the height returned from sizeThatFits otherwise.
+        if galleryStripHeightConstraint.constant > 0 {
+            height += galleryView.sizeThatFits(innerSize).height
+            height += galleryStripBottomConstraint.constant
+        }
 
         // The attribution view's height constraint is to be less than or equal
         // to the constant. Skip the math when the constant is zero, but use
@@ -401,12 +411,15 @@ import WordPressShared
     }
 
     private func configureGalleryStrip() {
-        if contentProvider == nil || true {
+        //TODO: Fix
+        if contentProvider == nil || false {
+            galleryStripHeightConstraint.constant = 0.0
             galleryStripBottomConstraint.constant = 0.0
             galleryView.configureView(nil)
         } else {
             galleryView.configureView(contentProvider)
             galleryStripBottomConstraint.constant = galleryStripBottomConstraintConstant
+            galleryStripHeightConstraint.constant = galleryStripViewHeight
         }
     }
 
