@@ -116,9 +116,10 @@ static NSString * const ImagePattern = @"<img(\\s+.*?)(?:src\\s*=\\s*(?:'|\")(.*
 + (NSArray *)extractAllImageMatchesFromPostContent:(NSString *)content
 {
     NSMutableArray *imageMatches = [NSMutableArray new];
+    
     // If there is no image tag in the content, just bail.
     if (!content || [content rangeOfString:@"<img"].location == NSNotFound) {
-        [NSArray arrayWithArray:imageMatches];
+        return [NSArray arrayWithArray:imageMatches];
     }
     
     // Get all the things
