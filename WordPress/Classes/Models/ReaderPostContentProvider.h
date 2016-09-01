@@ -34,4 +34,7 @@ typedef NS_ENUM(NSUInteger, SourceAttributionStyle) {
 - (NSString *)crossPostOriginSiteURLForDisplay;
 - (BOOL)isCommentCrossPost;
 
+- (BOOL)hasGallery;
+- (NSArray *)galleryImages;
+
 @end

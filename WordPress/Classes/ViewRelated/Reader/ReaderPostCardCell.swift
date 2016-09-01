@@ -411,8 +411,7 @@ import WordPressShared
     }
 
     private func configureGalleryStrip() {
-        //TODO: Fix
-        if contentProvider == nil || false {
+        if (contentProvider == nil || !contentProvider!.hasGallery()) {
             galleryStripHeightConstraint.constant = 0.0
             galleryStripBottomConstraint.constant = 0.0
             galleryView.configureView(nil)

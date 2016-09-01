@@ -4,6 +4,7 @@
 #import "SourcePostAttribution.h"
 #import "NSString+Util.h"
 #import "NSString+Helpers.h"
+#import "DisplayableImageHelper.h"
 #import "NSString+XMLExtensions.h"
 #import "WordPressAppDelegate.h"
 #import "WPAccount.h"
@@ -305,5 +306,20 @@ NSString * const ReaderPostStoredCommentTextKey = @"comment";
     return nil;
 }
 
+- (BOOL)hasGallery
+{
+    NSArray *images = self.galleryImages;
+    if (images && images.count > 0) {
+        return YES;
+    }
+    
+    return NO;
+}
+
+- (NSArray *)galleryImages
+{
+    NSString *content = [self contentForDisplay];
+    return [DisplayableImageHelper searchPostContentForGalleryImages:content];
+}
 
 @end
