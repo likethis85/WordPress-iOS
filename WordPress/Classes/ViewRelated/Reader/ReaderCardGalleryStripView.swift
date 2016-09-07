@@ -6,7 +6,7 @@ import WordPressShared
     @IBOutlet private weak var galleryImageView1: UIImageView!
     @IBOutlet private weak var galleryImageView2: UIImageView!
     @IBOutlet private weak var numberOfImagesLabel: UILabel!
-    @IBOutlet private weak var viewGalleryLabel: UIButton!
+    @IBOutlet private weak var viewGalleryButton: UIButton!
 
     // MARK: - Lifecycle Methods
 
@@ -56,6 +56,9 @@ import WordPressShared
                 galleryImageView1.setImageWithURL(galleryImageURL!, placeholderImage:nil)
             }
         }
+
+        configureButtonForGalleryTitle()
+        numberOfImagesLabel.attributedText = attributedTextForGalleryCount(contentProvider.galleryImages().count)
     }
 
     private func requestForURL(url:NSURL) -> NSURLRequest {
@@ -77,5 +80,27 @@ import WordPressShared
         }
 
         return request
+    }
+
+    private func attributedTextForGalleryCount(pictureCount:Int) -> NSAttributedString? {
+        let attrStr = NSMutableAttributedString()
+
+        let imagesStr = NSLocalizedString("images",
+                                         comment: "Part of a label letting the user know how many images are in a image gallery. For example: '6 images'")
+
+        let fullStr = String(format: "%d %@ ", pictureCount, imagesStr)
+        let attributes = WPStyleGuide.readerCardWordCountAttributes() as! [String: AnyObject]
+        let attrImageCount = NSAttributedString(string: fullStr, attributes: attributes)
+        attrStr.appendAttributedString(attrImageCount)
+
+        return attrStr
+    }
+
+    private func configureButtonForGalleryTitle() {
+        let galleryTitleStr = NSLocalizedString("View Images",
+                                          comment: "Label for a button that the user presses to view an image gallery.")
+
+        viewGalleryButton.setTitle(galleryTitleStr, forState: .Normal)
+        WPStyleGuide.applyReaderCardTagButtonStyle(viewGalleryButton)
     }
 }
