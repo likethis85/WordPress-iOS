@@ -200,7 +200,7 @@ class PostListViewController : AbstractPostListViewController, UIViewControllerR
     // MARK: - Sync Methods
 
     override func postTypeToSync() -> PostServiceType {
-        return PostServiceType.Post
+        return PostServiceTypePost
     }
 
     override func lastSyncDate() -> NSDate? {
@@ -253,7 +253,7 @@ class PostListViewController : AbstractPostListViewController, UIViewControllerR
             predicates.append(basePredicate)
         }
 
-        let typePredicate = NSPredicate(format: "postType = %@", PostService.keyForType(postTypeToSync()))
+        let typePredicate = NSPredicate(format: "postType = %@", postTypeToSync())
         predicates.append(typePredicate)
 
         let searchText = currentSearchTerm()
@@ -368,7 +368,7 @@ class PostListViewController : AbstractPostListViewController, UIViewControllerR
 
     private func createPostInNativeEditor() {
         let post = PostService.createDraftPostInMainContextForBlog(blog)
-        let postViewController = AztecPostViewController(post:post)
+        let postViewController = AztecPostViewController(post: post)
         let navController = UINavigationController(rootViewController: postViewController)
         navController.modalPresentationStyle = .FullScreen
         presentViewController(navController, animated: true, completion: nil)

@@ -68,7 +68,15 @@ class NoteTableViewCell: WPTableViewCell
             return noticonLabel.text
         }
     }
-    var onUndelete: (Void -> Void)?
+    override var backgroundColor: UIColor? {
+        didSet {
+            // Note: This is done to improve scrolling performance!
+            snippetLabel.backgroundColor = backgroundColor
+            subjectLabel.backgroundColor = backgroundColor
+            separatorsView.backgroundColor = backgroundColor
+        }
+    }
+    var onUndelete: (() -> Void)?
 
 
 
@@ -155,7 +163,6 @@ class NoteTableViewCell: WPTableViewCell
     }
 
     override func layoutSubviews() {
-        refreshLabelPreferredMaxLayoutWidth()
         refreshBackgrounds()
         super.layoutSubviews()
     }
@@ -175,12 +182,6 @@ class NoteTableViewCell: WPTableViewCell
 
 
     // MARK: - Private Methods
-    private func refreshLabelPreferredMaxLayoutWidth() {
-        let maxWidthLabel = frame.width - Settings.textInsets.right - subjectLabel.frame.minX
-        subjectLabel.preferredMaxLayoutWidth = maxWidthLabel
-        snippetLabel.preferredMaxLayoutWidth = maxWidthLabel
-    }
-
     private func refreshBackgrounds() {
         // Noticon Background
         if unapproved {
@@ -237,42 +238,6 @@ class NoteTableViewCell: WPTableViewCell
 
 
 
-    // MARK: - Public Static Helpers
-    class func layoutHeightWithWidth(width: CGFloat, subject: NSAttributedString?, snippet: NSAttributedString?) -> CGFloat {
-
-        // Limit the width (iPad Devices)
-        let cellWidth = min(width, Style.maximumCellWidth)
-        var cellHeight = Settings.textInsets.top + Settings.textInsets.bottom
-
-        // Calculate the maximum label size
-        let maxLabelWidth = cellWidth - Settings.textInsets.left - Settings.textInsets.right
-        let maxLabelSize = CGSize(width: maxLabelWidth, height: CGFloat.max)
-
-        // Helpers
-        let showsSnippet = snippet != nil
-
-        // If we must render a snippet, the maximum subject height will change. Account for that please
-        if let unwrappedSubject = subject {
-            let subjectRect = unwrappedSubject.boundingRectWithSize(maxLabelSize,
-                                                                    options: .UsesLineFragmentOrigin,
-                                                                    context: nil)
-
-            cellHeight += min(subjectRect.height, Settings.subjectMaximumHeight(showsSnippet))
-        }
-
-        if let unwrappedSubject = snippet {
-            let snippetRect = unwrappedSubject.boundingRectWithSize(maxLabelSize,
-                                                                    options: .UsesLineFragmentOrigin,
-                                                                    context: nil)
-
-            cellHeight += min(snippetRect.height, Settings.snippetMaximumHeight())
-        }
-
-        return max(cellHeight, Settings.minimumCellHeight)
-    }
-
-
-
     // MARK: - Action Handlers
     @IBAction func undeleteWasPressed(sender: AnyObject) {
         onUndelete?()
@@ -285,8 +250,6 @@ class NoteTableViewCell: WPTableViewCell
 
     // MARK: - Private Settings
     private struct Settings {
-        static let minimumCellHeight = CGFloat(70)
-        static let textInsets = UIEdgeInsets(top: 9.0, left: 71.0, bottom: 12.0, right: 12.0)
         static let separatorInsets = UIEdgeInsets(top: 0.0, left: 12.0, bottom: 0.0, right: 0.0)
         static let subjectNumberOfLinesWithoutSnippet = 3
         static let subjectNumberOfLinesWithSnippet = 2
