@@ -22,7 +22,7 @@
             <nil key="simulatedBottomBarMetrics"/>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <connections>
-                <outlet property="galleryImage" destination="RYA-HG-ZPa" id="hl0-Vq-hBK"/>
+                <outlet property="galleryImageView" destination="RYA-HG-ZPa" id="3Zr-Vk-XU9"/>
             </connections>
             <point key="canvasLocation" x="1" y="-31"/>
         </view>

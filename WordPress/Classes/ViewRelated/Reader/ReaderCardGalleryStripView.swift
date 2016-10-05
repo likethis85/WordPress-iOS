@@ -1,23 +1,34 @@
 import Foundation
 import WordPressShared
 
+/// Stores gallery image details
+internal struct GalleryImageInfo {
+    let imageURL: NSURL
+    let isPrivate: Bool
+
+    var description: String {
+        return "Gallery Image - URL: \(imageURL) isPrivate: \(isPrivate)"
+    }
+}
+
 @objc public class ReaderCardGalleryStripView: UIView
 {
     @IBOutlet private weak var galleryImageCollectionView: UICollectionView!
     @IBOutlet private weak var numberOfImagesLabel: UILabel!
     @IBOutlet private weak var viewGalleryButton: UIButton!
 
-    private var modell:[[UIColor]] = []
     private var storedOffsets = [Int: CGFloat]()
+    private let galleryCellIdentifier = "GalleryStripCell"
+    private var galleryImages: [GalleryImageInfo] = []
+
 
     // MARK: - Lifecycle Methods
 
     public override func awakeFromNib() {
         super.awakeFromNib()
-        
-        // Register the colleciton cell
+
         let nibName = UINib(nibName: "ReaderCardGalleryStripCell", bundle:nil)
-        galleryImageCollectionView.registerNib(nibName, forCellWithReuseIdentifier: "GalleryStripCell")
+        galleryImageCollectionView.registerNib(nibName, forCellWithReuseIdentifier: galleryCellIdentifier)
     }
 
     // MARK: - Configuration
@@ -28,8 +39,6 @@ import WordPressShared
             reset()
             return
         }
-
-        modell = generateRandomBunkData()
 
         configureGalleryImageStrip(cp)
         invalidateIntrinsicContentSize()
@@ -46,55 +55,21 @@ import WordPressShared
     }
 
     private func reset() {
+        galleryImages = []
         galleryImageCollectionView.reloadData()
     }
 
     private func configureGalleryImageStrip(contentProvider: ReaderPostContentProvider) {
         setCollectionViewDataSourceDelegate(self)
-
-//        let size = CGSize(width:self.galleryImageView1.frame.width, height:self.galleryImageView1.frame.height)
-//        for item in contentProvider.galleryImages() {
-//
-//            let galleryImageURL = NSURL(string: item as! String)
-//            if !(contentProvider.isPrivate()) {
-//                let url = PhotonImageURLHelper.photonURLWithSize(size, forImageURL: galleryImageURL)
-//                galleryImageView1.setImageWithURL(url, placeholderImage:nil)
-//
-//            } else if (galleryImageURL!.host != nil) && galleryImageURL!.host!.hasSuffix("wordpress.com") {
-//                // private wpcom image needs special handling.
-//                let url = WPImageURLHelper.imageURLWithSize(size, forImageURL: galleryImageURL!)
-//                let request = requestForURL(url)
-//                galleryImageView1.setImageWithURLRequest(request, placeholderImage: nil, success: nil, failure: nil)
-//
-//            } else {
-//                // private but not a wpcom hosted image
-//                galleryImageView1.setImageWithURL(galleryImageURL!, placeholderImage:nil)
-//            }
-//        }
-
         configureButtonForGalleryTitle()
         numberOfImagesLabel.attributedText = attributedTextForGalleryCount(contentProvider.galleryImages().count)
-    }
 
-    private func requestForURL(url:NSURL) -> NSURLRequest {
-        var requestURL = url
+        for item in contentProvider.galleryImages() {
 
-        let absoluteString = requestURL.absoluteString
-        if !(absoluteString!.hasPrefix("https")) {
-            let sslURL = absoluteString!.stringByReplacingOccurrencesOfString("http", withString: "https")
-            requestURL = NSURL(string: sslURL)!
+            let galleryImageURL = NSURL(string: item as! String)
+            let galleryImage = GalleryImageInfo(imageURL: galleryImageURL!, isPrivate: contentProvider.isPrivate())
+            galleryImages.append(galleryImage)
         }
-
-        let request = NSMutableURLRequest(URL: requestURL)
-
-        let acctServ = AccountService(managedObjectContext: ContextManager.sharedInstance().mainContext)
-        if let account = acctServ.defaultWordPressComAccount() {
-            let token = account.authToken
-            let headerValue = String(format: "Bearer %@", token)
-            request.addValue(headerValue, forHTTPHeaderField: "Authorization")
-        }
-
-        return request
     }
 
     private func attributedTextForGalleryCount(pictureCount:Int) -> NSAttributedString? {
@@ -125,37 +100,18 @@ import WordPressShared
         galleryImageCollectionView.setContentOffset(galleryImageCollectionView.contentOffset, animated:false) // Stops collection view if it was scrolling.
         reset()
     }
-
-    private func generateRandomBunkData() -> [[UIColor]] {
-        let numberOfRows = 20
-        let numberOfItemsPerRow = 15
-
-        return (0..<numberOfRows).map { _ in
-            return (0..<numberOfItemsPerRow).map { _ in UIColor.randomColor() }
-        }
-    }
-}
-
-extension UIColor {
-    class func randomColor() -> UIColor {
-
-        let hue = CGFloat(arc4random() % 100) / 100
-        let saturation = CGFloat(arc4random() % 100) / 100
-        let brightness = CGFloat(arc4random() % 100) / 100
-
-        return UIColor(hue: hue, saturation: saturation, brightness: brightness, alpha: 1.0)
-    }
 }
 
 extension ReaderCardGalleryStripView: UICollectionViewDelegate, UICollectionViewDataSource {
     public func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return modell[collectionView.tag].count
+        return galleryImages.count
     }
 
     public func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("GalleryStripCell", forIndexPath: indexPath)
+        let cell = collectionView.dequeueReusableCellWithReuseIdentifier(galleryCellIdentifier, forIndexPath: indexPath) as! ReaderPostGalleryStripCell
 
-        cell.backgroundColor = modell[collectionView.tag][indexPath.item]
+        let galleryImage: GalleryImageInfo = galleryImages[indexPath.row]
+        cell.setGalleryImage(galleryImage.imageURL, isPrivate: galleryImage.isPrivate)
 
         return cell
     }
