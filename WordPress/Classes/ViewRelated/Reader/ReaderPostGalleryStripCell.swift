@@ -1,6 +1,7 @@
 import UIKit
 
-class ReaderPostGalleryStripCell: UICollectionViewCell {
+class ReaderPostGalleryStripCell: UICollectionViewCell
+{
     @IBOutlet private weak var galleryImageView: UIImageView!
 
     func setGalleryImage(galleryImageURL: NSURL, isPrivate: Bool) {
@@ -14,7 +15,7 @@ class ReaderPostGalleryStripCell: UICollectionViewCell {
             // private wpcom image needs special handling.
             let url = WPImageURLHelper.imageURLWithSize(size, forImageURL: galleryImageURL)
             let request = requestForURL(url)
-            galleryImageView.setImageWithURLRequest(request, placeholderImage: nil, success: nil, failure: nil)            
+            galleryImageView.setImageWithURLRequest(request, placeholderImage: WPStyleGuide.galleryPlaceholderImage(), success: nil, failure: nil)
         } else {
             // private but not a wpcom hosted image
             galleryImageView.setImageWithURL(galleryImageURL, placeholderImage:nil)

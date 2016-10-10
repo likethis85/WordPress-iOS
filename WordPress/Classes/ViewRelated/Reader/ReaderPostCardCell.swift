@@ -414,7 +414,6 @@ import WordPressShared
         if (contentProvider == nil || !contentProvider!.hasGallery()) {
             galleryStripHeightConstraint.constant = 0.0
             galleryStripBottomConstraint.constant = 0.0
-            galleryView.configureView(nil)
         } else {
             galleryView.configureView(contentProvider)
             galleryStripBottomConstraint.constant = galleryStripBottomConstraintConstant

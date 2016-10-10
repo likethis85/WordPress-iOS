@@ -2,7 +2,8 @@ import Foundation
 import WordPressShared
 
 /// Stores gallery image details
-internal struct GalleryImageInfo {
+internal struct GalleryImageInfo
+{
     let imageURL: NSURL
     let isPrivate: Bool
 
@@ -55,7 +56,7 @@ internal struct GalleryImageInfo {
     }
 
     private func reset() {
-        galleryImages = []
+        galleryImages.removeAll()
         galleryImageCollectionView.reloadData()
     }
 
@@ -102,7 +103,8 @@ internal struct GalleryImageInfo {
     }
 }
 
-extension ReaderCardGalleryStripView: UICollectionViewDelegate, UICollectionViewDataSource {
+extension ReaderCardGalleryStripView: UICollectionViewDelegate, UICollectionViewDataSource
+{
     public func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return galleryImages.count
     }

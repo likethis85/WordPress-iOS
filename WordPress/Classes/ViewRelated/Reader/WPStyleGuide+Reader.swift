@@ -48,6 +48,10 @@ extension WPStyleGuide
 
     // MARK: - Reader Card Styles
 
+    public class func galleryPlaceholderImage() -> UIImage {
+        return UIImage(named: "blavatar-default")!
+    }
+
     // MARK: - Custom Colors
     public class func readerCardCellBorderColor() -> UIColor {
         return UIColor(red: 215.0/255.0, green: 227.0/255.0, blue: 235.0/255.0, alpha: 1.0)
