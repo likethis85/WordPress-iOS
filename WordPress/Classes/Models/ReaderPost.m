@@ -309,7 +309,7 @@ NSString * const ReaderPostStoredCommentTextKey = @"comment";
 - (BOOL)hasGallery
 {
     NSArray *images = self.galleryImages;
-    if (images && images.count > 0) {
+    if (images && images.count > 1) {
         return YES;
     }
     
