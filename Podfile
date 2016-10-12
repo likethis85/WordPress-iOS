@@ -34,6 +34,7 @@ abstract_target 'WordPress_Base' do
     pod 'Crashlytics'
     pod 'BuddyBuildSDK', '~> 1.0.11', :configurations => ['Release-Alpha']
     pod 'FLAnimatedImage', '~> 1.0'
+    pod 'IDMPhotoBrowser'
     # ----------------------------
     # Forked third party libraries
     # ----------------------------

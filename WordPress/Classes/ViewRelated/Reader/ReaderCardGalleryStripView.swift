@@ -1,5 +1,6 @@
 import Foundation
 import WordPressShared
+import IDMPhotoBrowser
 
 /// Stores gallery image details
 internal struct GalleryImageInfo
@@ -31,6 +32,7 @@ internal struct GalleryImageInfo
         let nibName = UINib(nibName: "ReaderCardGalleryStripCell", bundle:nil)
         galleryImageCollectionView.registerNib(nibName, forCellWithReuseIdentifier: galleryCellIdentifier)
     }
+
 
     // MARK: - Configuration
 
@@ -101,10 +103,58 @@ internal struct GalleryImageInfo
         galleryImageCollectionView.setContentOffset(galleryImageCollectionView.contentOffset, animated:false) // Stops collection view if it was scrolling.
         reset()
     }
+
+
+    // MARK: - Instance Methods
+
+    public func presentGalleryImages() {
+        // Start on the first image by default
+        presentLightBoxVC(0)
+    }
+
+
+    // MARK: - Helpers
+
+    private func getCurrentViewController() -> UIViewController? {
+        if let rootController = UIApplication.sharedApplication().keyWindow?.rootViewController {
+            var currentController: UIViewController! = rootController
+            while( currentController.presentedViewController != nil ) {
+                currentController = currentController.presentedViewController
+            }
+            return currentController
+        }
+        return nil
+    }
+
+    private func presentLightBoxVC(startingGalleryImageIndex:Int) {
+        let photoURLs = NSMutableArray()
+
+        for galleryImage:GalleryImageInfo in galleryImages {
+            photoURLs.addObject(galleryImage.imageURL)
+        }
+
+        let urlArray: [NSURL] = photoURLs.flatMap({ $0 as? NSURL })
+        let browser = IDMPhotoBrowser(photos: IDMPhoto.photosWithURLs(urlArray))
+        browser.setInitialPageIndex(UInt(startingGalleryImageIndex))
+
+        let currentVC = self.getCurrentViewController()
+        currentVC?.presentViewController(browser, animated: true, completion: nil)
+    }
+
+
+    // MARK: -
+
 }
 
 extension ReaderCardGalleryStripView: UICollectionViewDelegate, UICollectionViewDataSource
 {
+    public func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
+        // The following needs to be called here to prevent a NSInternalInconsistencyException in the collection view
+        // See: http://stackoverflow.com/questions/18339030/uicollectionview-assertion-error-on-stale-data
+        collectionView.collectionViewLayout.invalidateLayout()
+        return 1
+    }
+
     public func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return galleryImages.count
     }
@@ -119,6 +169,6 @@ extension ReaderCardGalleryStripView: UICollectionViewDelegate, UICollectionView
     }
 
     public func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        print("Collection view at row \(collectionView.tag) selected index path \(indexPath)")
+        presentLightBoxVC(indexPath.row)
     }
 }

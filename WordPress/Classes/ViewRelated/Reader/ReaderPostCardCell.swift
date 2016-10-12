@@ -644,6 +644,10 @@ import WordPressShared
         }
     }
 
+    @IBAction func didTapViewImagesButton(sender: AnyObject) {
+        galleryView.presentGalleryImages()
+    }
+
 
     // MARK: - RichTextView Delegate Methods
 

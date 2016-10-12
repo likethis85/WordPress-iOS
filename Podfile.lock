@@ -31,6 +31,7 @@ PODS:
     - CocoaLumberjack/Default
   - Crashlytics (3.8.1):
     - Fabric (~> 1.6.3)
+  - DACircularProgress (2.3.1)
   - DTCoreText (1.6.16):
     - DTFoundation/Core (~> 1.7.5)
     - DTFoundation/DTAnimatedGIF (~> 1.7.5)
@@ -80,6 +81,10 @@ PODS:
   - HockeySDK (3.8.6):
     - HockeySDK/AllFeaturesLib (= 3.8.6)
   - HockeySDK/AllFeaturesLib (3.8.6)
+  - IDMPhotoBrowser (1.9.1):
+    - DACircularProgress
+    - pop
+    - SDWebImage
   - Lookback (1.4.1):
     - PDKTZipArchive
   - Mixpanel (2.9.4):
@@ -133,7 +138,11 @@ PODS:
   - OHHTTPStubs/Swift (4.6.0):
     - OHHTTPStubs/Core
   - PDKTZipArchive (0.4.1)
+  - pop (1.0.9)
   - Reachability (3.2)
+  - SDWebImage (3.8.2):
+    - SDWebImage/Core (= 3.8.2)
+  - SDWebImage/Core (3.8.2)
   - Simperium (0.8.17):
     - Simperium/DiffMatchPach (= 0.8.17)
     - Simperium/JRSwizzle (= 0.8.17)
@@ -198,6 +207,7 @@ DEPENDENCIES:
   - Gridicons (from `https://github.com/Automattic/Gridicons-iOS.git`, commit `8bd04e18eddaaf36810887c94837571e68f7cc24`)
   - Helpshift (~> 5.7.1)
   - HockeySDK (~> 3.8.0)
+  - IDMPhotoBrowser
   - Lookback (= 1.4.1)
   - Mixpanel (= 2.9.4)
   - MRProgress (~> 0.7.0)
@@ -259,6 +269,7 @@ SPEC CHECKSUMS:
   BuddyBuildSDK: f4682598772ae66c9ef5554d2d78d0a19fb413a0
   CocoaLumberjack: 17fe8581f84914d5d7e6360f7c70022b173c3ae0
   Crashlytics: 4391d8df0b125345e9f209c5db6e7f40a6a8435d
+  DACircularProgress: 4dd437c0fc3da5161cb289e07ac449493d41db71
   DTCoreText: 934a16fe9ffdd169c96261721b39dc312b75713d
   DTFoundation: 3b6b1b817d2a7fb02e7eaf2596c922a68145bd43
   Expecta: e1c022fcd33910b6be89c291d2775b3fe27a89fe
@@ -268,6 +279,7 @@ SPEC CHECKSUMS:
   Gridicons: 5c33065054b19e56a47d252b52e321746b97a414
   Helpshift: 48ee4b24dc5f0ae7d1dfd8dded6eea327069a014
   HockeySDK: ab68303eec6680f6b539de65d747742dd276e934
+  IDMPhotoBrowser: 35e8ba559a88f2a8be4ae04d7fd424665344ba06
   Lookback: 37c23f97894612f6eccc215440c8f990fbb5a607
   Mixpanel: 80d2ca9bb38ae91c1044d738e80fe448377ac89f
   MRProgress: 1cb0051b678be4a2ef4881414cd316768fc70028
@@ -277,7 +289,9 @@ SPEC CHECKSUMS:
   OCMock: a10ea9f0a6e921651f96f78b6faee95ebc813b92
   OHHTTPStubs: cb1aefbbeb4de4e741644455d4b945538e5248a2
   PDKTZipArchive: 22bbab52b49f46a3adf1acf134311fd252c43feb
+  pop: f667631a5108a2e60d9e8797c9b32ddaf2080bce
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
+  SDWebImage: 098e97e6176540799c27e804c96653ee0833d13c
   Simperium: 0111b16b6d72bc598a99e244ef87025ae433b27e
   Specta: ac94d110b865115fe60ff2c6d7281053c6f8e8a2
   SVProgressHUD: 748080e4f36e603f6c02aec292664239df5279c1
@@ -292,6 +306,6 @@ SPEC CHECKSUMS:
   WPMediaPicker: 645ecc2435293cc898c76180f3994358a68cae20
   wpxmlrpc: 38623cc415117914d6ab5bf2ab8a57a4076cc469
 
-PODFILE CHECKSUM: f5749f8254776a7245dfc75034fa8df38e014bf7
+PODFILE CHECKSUM: df1b7057b2a3e341f4fceadbcd65a3d1b4293338
 
 COCOAPODS: 1.0.1
