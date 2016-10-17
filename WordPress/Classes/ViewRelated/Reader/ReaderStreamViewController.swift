@@ -60,7 +60,6 @@ import WordPressComAnalytics
     private var didSetupView = false
     private var listentingForBlockedSiteNotification = false
 
-
     /// Used for fetching content.
     private lazy var displayContext = ContextManager.sharedInstance().newMainContextChildContext()
 
@@ -726,11 +725,11 @@ import WordPressComAnalytics
 
         // Create the action sheet
         let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .ActionSheet)
-        alertController.addCancelActionWithTitle(ActionSheetButtonTitles.cancel, handler: nil)
+        alertController.addCancelActionWithTitle(ReaderPostMenuButtonTitles.cancel, handler: nil)
 
         // Block button
         if shouldShowBlockSiteMenuItem() {
-            alertController.addActionWithTitle(ActionSheetButtonTitles.blockSite,
+            alertController.addActionWithTitle(ReaderPostMenuButtonTitles.blockSite,
                 style: .Destructive,
                 handler: { (action:UIAlertAction) in
                     if let post = self.postWithObjectID(post.objectID) {
@@ -741,7 +740,7 @@ import WordPressComAnalytics
 
         // Following
         if ReaderHelpers.topicIsFollowing(topic) {
-            let buttonTitle = post.isFollowing ? ActionSheetButtonTitles.unfollow : ActionSheetButtonTitles.follow
+            let buttonTitle = post.isFollowing ? ReaderPostMenuButtonTitles.unfollow : ReaderPostMenuButtonTitles.follow
             alertController.addActionWithTitle(buttonTitle,
                 style: .Default,
                 handler: { (action:UIAlertAction) in
@@ -752,7 +751,7 @@ import WordPressComAnalytics
         }
 
         // Visit site
-        alertController.addActionWithTitle(ActionSheetButtonTitles.visit,
+        alertController.addActionWithTitle(ReaderPostMenuButtonTitles.visit,
             style: .Default,
             handler: { (action:UIAlertAction) in
                 if let post = self.postWithObjectID(post.objectID) {
@@ -761,7 +760,7 @@ import WordPressComAnalytics
         })
 
         // Share
-        alertController.addActionWithTitle(ActionSheetButtonTitles.share,
+        alertController.addActionWithTitle(ReaderPostMenuButtonTitles.share,
             style: .Default,
             handler: { [weak self] (action:UIAlertAction) in
                 self?.sharePost(post.objectID, fromView: anchorView)
@@ -848,7 +847,12 @@ import WordPressComAnalytics
 
 
     private func visitSiteForPost(post:ReaderPost) {
-        let siteURL = NSURL(string: post.blogURL)!
+        guard
+            let permalink = post.permaLink,
+            let siteURL = NSURL(string: permalink) else {
+                return
+        }
+
         let controller = WPWebViewController(URL: siteURL)
         controller.addsWPComReferrer = true
         let navController = UINavigationController(rootViewController: controller)
@@ -889,6 +893,7 @@ import WordPressComAnalytics
             // Solves a long-standing question from folks who ask 'why do I
             // have more likes than page views?'.
             ReaderHelpers.bumpPageViewForPost(post)
+            WPNotificationFeedbackGenerator.notificationOccurred(.Success)
         }
         let service = ReaderPostService(managedObjectContext: managedObjectContext())
         service.toggleLikedForPost(post, success: nil, failure: { (error:NSError?) in
@@ -1385,8 +1390,13 @@ import WordPressComAnalytics
 
 
     func toggleFollowingForTag(topic:ReaderTagTopic) {
+        if !topic.following {
+            WPNotificationFeedbackGenerator.notificationOccurred(.Success)
+        }
+
         let service = ReaderTopicService(managedObjectContext: topic.managedObjectContext)
         service.toggleFollowingForTag(topic, success: nil, failure: { (error:NSError?) in
+            WPNotificationFeedbackGenerator.notificationOccurred(.Error)
             self.updateStreamHeaderIfNeeded()
         })
         self.updateStreamHeaderIfNeeded()
@@ -1394,8 +1404,13 @@ import WordPressComAnalytics
 
 
     func toggleFollowingForSite(topic:ReaderSiteTopic) {
+        if !topic.following {
+            WPNotificationFeedbackGenerator.notificationOccurred(.Success)
+        }
+
         let service = ReaderTopicService(managedObjectContext: topic.managedObjectContext)
         service.toggleFollowingForSite(topic, success:nil, failure: { (error:NSError?) in
+            WPNotificationFeedbackGenerator.notificationOccurred(.Error)
             self.updateStreamHeaderIfNeeded()
         })
         self.updateStreamHeaderIfNeeded()
@@ -1656,7 +1671,6 @@ extension ReaderStreamViewController : WPTableViewHandlerDelegate {
         configureCell(cell, atIndexPath: indexPath)
         return cell
     }
-
 
     public func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
         // Check to see if we need to load more.
